@@ -1,1 +1,5 @@
-theme: jekyll-theme-cayman
+# _config.yml
+theme: jekyll-theme-minimal
+title: "Project Title / Paper Name"
+description: "Author Names • Lab / Institution"
+show_downloads: true
