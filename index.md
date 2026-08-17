@@ -4,7 +4,7 @@
 
 ## Architecture
 
-![RadExplain Architecture Diagram](Architecture.png)
+![RadExplain Architecture Diagram](assets/Architecture.png)
 
 ## Example Queries
 
