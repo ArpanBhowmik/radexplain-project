@@ -12,7 +12,7 @@ layout: default
     </div>
     <div class="author">
       <span class="author-name">Sarna Rani Bhaduri</span>
-      <span class="author-role">Rajshahi University</span>
+      <span class="author-role" style="text-align: center;">M.Sc. in Physics<br>Rajshahi University of Rajshahi</span>
     </div>
   </div>
 </header>
