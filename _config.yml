@@ -1,5 +1,24 @@
-# _config.yml
+# Theme selection (clean academic layout)
 theme: jekyll-theme-minimal
-title: "Project Title"
-description: "Author Name • Lab / Institution"
-show_downloads: true
+
+# Project metadata
+title: "Learning from Imperfect Signals"
+description: "Arpan Bhowmik & Sarna Rani Bhaduri Name<br><small>Samsung R&D Institute Bangladesh</small>"
+
+# Sidebar & Navigation Links
+show_downloads: false
+google_analytics: # Optional: UA-XXXXX-Y or G-XXXXX
+
+# Custom links shown in sidebar (Minimal theme supports custom markdown/links)
+nav:
+  - title: "Paper (PDF)"
+    url: "#"
+  - title: "Code"
+    url: "#"
+  - title: "Dataset"
+    url: "#"
+
+# Markdown parser settings (supports code blocks and tables)
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
