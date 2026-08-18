@@ -2,8 +2,8 @@
 theme: jekyll-theme-minimal
 
 # Project metadata
-title: "Learning from Imperfect Signals"
-description: "Arpan Bhowmik & Sarna Rani Bhaduri Name<br><small>Samsung R&D Institute Bangladesh</small>"
+title: "RadExplain"
+description: "A Multi-Agent AI System for Clinical Radiation Oncology Decision Support"
 
 # Sidebar & Navigation Links
 show_downloads: false
