@@ -17,7 +17,7 @@ layout: default
   </div>
 </header>
 
-<p><strong>RadExplain</strong> combines a LangGraph-orchestrated agent pipeline with Retrieval-Augmented Generation (RAG) over QUANTEC literature to provide evidence-based dose safety assessments, treatment plan summaries, and clinical guideline interpretation.</p>
+<p><strong>RadExplain</strong> is a multi-agent AI system for clinical radiation oncology decision support. It combines a LangGraph-orchestrated agent pipeline with Retrieval-Augmented Generation (RAG) over QUANTEC literature to provide evidence-based dose safety assessments, treatment plan summaries, and clinical guideline interpretation.</p>
 
 <h2>Architecture</h2>
 <img src="assets/Architecture.png" alt="RadExplain Architecture Diagram">
@@ -150,108 +150,88 @@ layout: default
   </div>
 </div>
 
-<h2>Evaluation Results</h2>
-<p>The multi-agent system is benchmarked against a baseline LLM (no RAG, no specialized tools) on a 41-question clinical dataset. The results are scored by an LLM-as-a-Judge (GPT-OSS 120B).</p>
+## Evaluation Results
 
-<p><strong>Interactive Evaluation Dashboard</strong></p>
-<img src="assets/Evaluation.gif" alt="Evaluation Dashboard">
+The multi-agent system is benchmarked against a baseline LLM (no RAG, no specialized tools) on a 41-question clinical dataset. The results are scored by an LLM-as-a-Judge (GPT-OSS 120B).
 
-<h3>1. RadExplain vs Baseline by Category</h3>
-<img src="assets/headline_grouped_bar.png" alt="Category Performance">
+### 1. RadExplain vs Baseline by Category
+![Category Performance](assets/headline_grouped_bar.png)
 
-<h3>2. Overall Performance Comparison</h3>
-<img src="assets/overall_radar.png" alt="Overall Performance">
+To rigorously benchmark the system, we constructed a **41-question adversarial clinical dataset** explicitly designed to trigger known generative AI failure modes in healthcare. The questions are divided into six critical evaluation categories:
 
-<h3>3. Question-Level Heatmap</h3>
-<img src="assets/heatmap.png" alt="Question Heatmap">
+* **Single OAR Safety:** Tests the system's ability to accurately extract specific organ dosimetrics (e.g., Brainstem Dmax) and correctly apply deterministic QUANTEC limits. The baseline LLM often hallucinates the raw numbers.
+* **Multi-OAR Violation Scans:** Prompts the system to evaluate an entire patient DVH blindly. The baseline LLM frequently hallucinates "threshold-free comparisons" (e.g., stating an organ is safe just because its dose is lower than another organ's). RadExplain's Math Agent systematically checks every organ.
+* **Plan Summaries:** Tests the Summary Agent's ability to synthesize raw data and safety violations into a professional, cohesive clinical chart note.
+* **Clinical Context:** Pure medical knowledge queries (e.g., defining serial vs. parallel architecture). Tests the RAG pipeline's retrieval precision independently of patient data.
+* **Failure Mode Probes:** Deliberate trick questions designed to induce hallucinations. We test for *Fractionation Context Confusion* (asking about SBRT when limits are conventional) and *Calculation Volume Omission* (testing if the AI blindly approves a dose when the physical radiation grid is dangerously small). The baseline LLM fails completely here, whereas RadExplain actively flags the traps.
+* **Edge Cases:** Evaluates graceful failure, ensuring the system refuses to answer when queried with non-existent patient IDs (e.g., `pt_99`) rather than hallucinating fake clinical records.
 
-<h3>4. RAG Retrieval Performance</h3>
-<img src="assets/rag_metrics.png" alt="RAG Metrics">
+### 2. Overall Performance Comparison
+![Overall Performance](assets/overall_radar_v4.png)
 
-<h2>Key Design Decisions</h2>
-<table>
-  <thead>
-    <tr>
-      <th>Decision</th>
-      <th>Rationale</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><strong>LangGraph StateGraph</strong></td>
-      <td>Enables a cyclic Planner → Agent → Planner loop, allowing multi-step reasoning across agents</td>
-    </tr>
-    <tr>
-      <td><strong>Deterministic Math Tools</strong></td>
-      <td>QUANTEC safety checks use hardcoded Python functions (not LLM generation) to eliminate numerical hallucinations</td>
-    </tr>
-    <tr>
-      <td><strong>BGE Cross-Encoder Reranking</strong></td>
-      <td>Two-stage retrieval (embedding similarity → cross-encoder reranking) maximizes precision of clinical evidence</td>
-    </tr>
-    <tr>
-      <td><strong>Organ-Aware Retrieval</strong></td>
-      <td>RAG queries are filtered by detected organ to prevent cross-organ contamination in retrieved chunks</td>
-    </tr>
-    <tr>
-      <td><strong>LLM-as-Judge Evaluation</strong></td>
-      <td>GPT-OSS 120B scores responses on a 0-100 rubric with structured pass/fail classification</td>
-    </tr>
-    <tr>
-      <td><strong>Separate Baseline Runner</strong></td>
-      <td>Enables direct A/B comparison: same questions evaluated by raw LLM vs. full agentic pipeline</td>
-    </tr>
-  </tbody>
-</table>
+To evaluate the system objectively, we utilize an **LLM-as-a-Judge framework** (powered by a 120-Billion parameter model). The judge evaluates both the baseline LLM and RadExplain against a verified Ground Truth using a strict **100-point clinical rubric**.
 
-<h2>Tech Stack</h2>
-<table>
-  <thead>
-    <tr>
-      <th>Component</th>
-      <th>Technology</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><strong>Backend</strong></td>
-      <td>FastAPI &middot; Uvicorn</td>
-    </tr>
-    <tr>
-      <td><strong>Agent Orchestration</strong></td>
-      <td>LangGraph (LangChain)</td>
-    </tr>
-    <tr>
-      <td><strong>LLM</strong></td>
-      <td>LLaMA 3.3 70B via Groq</td>
-    </tr>
-    <tr>
-      <td><strong>Judge LLM</strong></td>
-      <td>GPT-OSS 120B via Groq</td>
-    </tr>
-    <tr>
-      <td><strong>Embeddings</strong></td>
-      <td>BGE-base-en-v1.5 (HuggingFace)</td>
-    </tr>
-    <tr>
-      <td><strong>Reranker</strong></td>
-      <td>BGE-reranker-base (Cross-Encoder)</td>
-    </tr>
-    <tr>
-      <td><strong>Vector Store</strong></td>
-      <td>ChromaDB</td>
-    </tr>
-    <tr>
-      <td><strong>Frontend</strong></td>
-      <td>Vanilla HTML/CSS/JS</td>
-    </tr>
-    <tr>
-      <td><strong>Evaluation UI</strong></td>
-      <td>Gradio</td>
-    </tr>
-    <tr>
-      <td><strong>Visualization</strong></td>
-      <td>Matplotlib &middot; Seaborn</td>
-    </tr>
-  </tbody>
-</table>
+**The 7-Dimension Scoring Rubric:**
+* **Numerical Accuracy (20 pts):** Strict verification of dose conversions (cGy to Gy) and safety margin arithmetic.
+* **Clinical Classification (20 pts):** Binary check if the model correctly passed or failed the organ based on QUANTEC limits.
+* **Reliability Warning (15 pts):** Ensures the AI flags physical data warnings (e.g., if the calculation volume for a Serial OAR is dangerously low at <80%).
+* **Faithfulness (15 pts):** Strict penalization for any fabricated statistics or thresholds not grounded in the retrieved literature.
+* **Metric Matching (10 pts):** Ensures the correct metric is applied to the correct organ architecture (e.g., Mean Dose for parallel parotids, Max Dose for serial brainstem).
+* **Appropriate Hedging (10 pts) & Concision (10 pts):** Evaluates clinical tone and refusal to definitively approve doses when critical context is missing (e.g., SBRT vs Conventional fractionation).
+
+**Critical Failures (Deductions):**
+Standard AI benchmarks often forgive "close" answers. In clinical radiotherapy, a close answer is a fatal error. The Judge actively deducts points for *Critical Failures*:
+* **-3 pts** for any mathematical error in dose comparison.
+* **-3 pts** for failing to warn the physician about missing grid calculation volume on a serial organ.
+* **-2 pts** for applying the wrong evaluation metric without flagging it.
+
+RadExplain's multi-agent architecture effectively mitigates these critical failures (averaging near-perfect scores), whereas the baseline LLM frequently triggers them due to mathematical hallucinations and metric confusion.
+
+### 3. RAG Retrieval Performance
+To ensure the Knowledge Agent grounds its responses in accurate clinical literature without hallucination, the Retrieval-Augmented Generation (RAG) pipeline was stress-tested against a robust dataset of **150 clinical queries** derived from QUANTEC guidelines.
+
+The pipeline utilizes a two-stage retrieval architecture: dense embedding search (`BGE-base-en-v1.5`) followed by cross-encoder reranking (`BGE-reranker-base`) combined with custom Organ-Aware Filtering to prevent cross-organ metric contamination.
+
+**150-Question Benchmark Results:**
+* **MRR Score (Mean Reciprocal Rank): `0.9419`** — The correct QUANTEC guideline chunk is almost universally returned as the absolute #1 ranked result.
+* **Hit@1 Rate: `91.3%`** — Top-1 Accuracy. In 9 out of 10 queries, the very first retrieved document perfectly contains the required clinical metrics.
+* **Hit@3 Rate: `96.7%`** — Top-3 Recall. 
+* **Hit@5 Rate: `98.0%`** — Generation Ceiling. This proves the system is structurally robust enough to handle deep, multi-step clinical reasoning without missing critical edge cases.
+* **Context Precision@5: `97.7%` (Organ Cleanliness)** — In medical AI, retrieving literature for the wrong organ is a fatal safety flaw (e.g., pulling a bladder dose limit when asked about the rectum). By actively filtering chunks *before* ranking, the system achieves a near-perfect precision rate. This means 97.7% of the clinical literature retrieved is strictly isolated to the specific organ the user asked about, eliminating cross-organ hallucinations.
+
+![RAG Metrics](assets/rag_metrics.png)
+
+## Key Design Decisions
+
+| Decision | Rationale |
+|---|---|
+| **LangGraph StateGraph** | Enables a cyclic Planner → Agent → Planner loop, allowing multi-step reasoning across agents |
+| **Deterministic Math Tools** | QUANTEC safety checks use hardcoded Python functions (not LLM generation) to eliminate numerical hallucinations |
+| **BGE Cross-Encoder Reranking** | Two-stage retrieval (embedding similarity → cross-encoder reranking) maximizes precision of clinical evidence |
+| **Organ-Aware Retrieval** | RAG queries are filtered by detected organ to prevent cross-organ contamination in retrieved chunks |
+| **LLM-as-Judge Evaluation** | GPT-OSS 120B scores responses on a 0-100 rubric with structured pass/fail classification |
+| **Separate Baseline Runner** | Enables direct A/B comparison: same questions evaluated by raw LLM vs. full agentic pipeline |
+
+## Tech Stack
+
+| Component | Technology |
+|---|---|
+| **Backend** | FastAPI · Uvicorn |
+| **Agent Orchestration** | LangGraph (LangChain) |
+| **LLM** | LLaMA 3.3 70B via Groq |
+| **Judge LLM** | GPT-OSS 120B via Groq |
+| **Embeddings** | BGE-base-en-v1.5 (HuggingFace) |
+| **Reranker** | BGE-reranker-base (Cross-Encoder) |
+| **Vector Store** | ChromaDB |
+| **Frontend** | Vanilla HTML/CSS/JS |
+| **Evaluation UI** | Gradio |
+| **Visualization** | Matplotlib · Seaborn |
+
+## Limitations & Future Work
+
+While RadExplain demonstrates strong automated evaluation metrics, it is designed strictly as a **decision-support research prototype**, not a deployed medical device. To ensure academic rigor and transparency, the following limitations are explicitly noted:
+
+* **Preliminary Automated Benchmarking:** The current evaluation relies on an LLM-as-a-Judge (GPT-OSS 120B) to establish baseline safety metrics. While the judge employs a strict deterministic 100-point clinical rubric, this serves as preliminary validation.
+* **Domain Expert Curation:** The evaluation dataset, QUANTEC reference limits, and deterministic mathematical constraints were heavily curated and verified in collaboration with a **Medical Physics domain expert** (M.Sc. Physics), ensuring the foundational dose arithmetic and baseline ground truths are physically and clinically sound.
+* **Documented Failure Modes:** Despite the agentic architecture's high performance, we manually identified and documented **14 extreme edge cases** where the baseline LLM's clinical reasoning collapses (e.g., *Fractionation Context Confusion*, *Calculation Volume Omission*). This adversarial dataset proves the necessity of multi-agent deterministic tooling.
+* **Future Work:** Transitioning from automated systems benchmarking to formal, blinded clinical validation with board-certified radiation oncologists.
