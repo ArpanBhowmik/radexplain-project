@@ -167,7 +167,7 @@ To rigorously benchmark the system, we constructed a **41-question adversarial c
 * **Edge Cases:** Evaluates graceful failure, ensuring the system refuses to answer when queried with non-existent patient IDs (e.g., `pt_99`) rather than hallucinating fake clinical records.
 
 ### 2. Overall Performance Comparison
-![Overall Performance](assets/overall_radar_v4.png)
+![Overall Performance](assets/overall_radar.png)
 
 To evaluate the system objectively, we utilize an **LLM-as-a-Judge framework** (powered by a 120-Billion parameter model). The judge evaluates both the baseline LLM and RadExplain against a verified Ground Truth using a strict **100-point clinical rubric**.
 
