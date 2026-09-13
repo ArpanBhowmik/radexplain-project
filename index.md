@@ -3,7 +3,7 @@ layout: default
 ---
 <header class="hero">
   <h1>RadExplain</h1>
-  <p class="subtitle">A Multi-Agent AI System for Clinical Radiation Oncology Decision Support</p>
+  <p class="subtitle">A Research Prototype for AI-Assisted Radiation Oncology Decision Support</p>
   
   <div class="authors">
     <div class="author">
@@ -19,8 +19,8 @@ layout: default
 
 <div class="abstract">
   <div class="abstract-title">Abstract</div>
-  <p>RadExplain is a multi-agent AI system for clinical radiation oncology decision support. It combines a LangGraph-orchestrated agent pipeline with Retrieval-Augmented Generation (RAG) over QUANTEC literature to provide evidence-based dose safety assessments, treatment plan summaries, and clinical guideline interpretation.</p>
-  <p>The system employs deterministic mathematical tools for QUANTEC safety checks (eliminating LLM numerical hallucinations), a two-stage RAG pipeline with cross-encoder reranking and organ-aware filtering (MRR: 0.94, Hit@1: 91.3%), and a multi-agent architecture that detects clinical edge cases missed by standard LLMs — including calculation volume warnings and fractionation context confusion. Evaluated on a 41-question adversarial clinical dataset using an LLM-as-a-Judge framework, RadExplain consistently outperforms the baseline LLM across all six evaluation categories.</p>
+  <p>RadExplain is a research prototype for AI-assisted radiation oncology plan interpretation. The system combines a LangGraph-based multi-agent workflow with Retrieval-Augmented Generation (RAG) over QUANTEC literature to generate treatment plan summaries, dose safety assessments, and guideline-grounded explanations.</p>
+  <p>To improve reliability, RadExplain employs deterministic dose calculations for QUANTEC constraint checking alongside a two-stage retrieval pipeline with cross-encoder reranking and organ-aware filtering (MRR 0.94, Hit@1 91.3% on the internal retrieval benchmark). In an internal evaluation on a 41-question adversarial benchmark, the system demonstrated improved handling of several clinically relevant edge cases compared with a baseline LLM.</p>
 </div>
 
 <div class="toc">

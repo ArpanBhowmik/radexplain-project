@@ -2,7 +2,7 @@
 
 # Project metadata
 title: "RadExplain"
-description: "A Multi-Agent AI System for Clinical Radiation Oncology Decision Support"
+description: "A Research Prototype for AI-Assisted Radiation Oncology Decision Support"
 
 # Disable default theme — we use a fully custom layout
 plugins: []
