@@ -28,10 +28,12 @@ layout: default
   <ol>
     <li><a href="#architecture">Architecture</a></li>
     <li><a href="#example-queries">Example Queries</a></li>
+    <li><a href="#clinical-edge-cases">Clinical Edge Cases Handled</a></li>
+    <li><a href="#dataset-origin">Dataset Origin</a></li>
     <li><a href="#evaluation-results">Evaluation Results</a></li>
     <li><a href="#key-design-decisions">Key Design Decisions</a></li>
     <li><a href="#tech-stack">Tech Stack</a></li>
-    <li><a href="#limitations--future-work">Limitations & Future Work</a></li>
+    <li><a href="#limitations--future-work">Limitations &amp; Future Work</a></li>
   </ol>
 </div>
 
@@ -172,6 +174,41 @@ layout: default
     <p>According to the QUANTEC guidelines, the primary complication associated with high radiation dose to the mandible is Osteoradionecrosis (ORN). The risk of ORN increases significantly when the maximum dose exceeds 70 Gy. Preventive measures such as pre-radiotherapy dental evaluation and maintaining excellent oral hygiene are strongly recommended to mitigate this risk.</p>
   </div>
 </div>
+
+<h2 id="clinical-edge-cases">Clinical Edge Cases Handled</h2>
+
+To ensure patient safety, RadExplain's agentic workflow was explicitly engineered to intercept complex radiotherapy edge cases that cause standard LLMs to hallucinate. The system handles these via deterministic Python tools rather than relying on generative reasoning:
+
+<table class="eval-table">
+  <thead>
+    <tr>
+      <th>Edge Case</th>
+      <th>Failure Mode &amp; Mitigation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Spatial Truncation<br>("Calc Vol" Trap)</td>
+      <td>Standard LLMs blindly approve maximum doses even when the physical dose grid is artificially cropped. RadExplain's <code>check_quantec_limit</code> tool actively intercepts the <code>calc_vol_pct</code> metadata. If the calculation volume is &lt; 95.0%, it triggers a clinical reliability warning (&ldquo;may underestimate true maximum dose&rdquo;). If it is &lt; 20.0%, it strictly flags the result as &ldquo;severely unreliable&rdquo;, preventing the AI from confidently clearing a potentially dangerous plan.</td>
+    </tr>
+    <tr>
+      <td>Two-Gland Parotid Rule</td>
+      <td>QUANTEC dictates that only <em>one</em> parotid gland needs to be spared to &le; 20 Gy (or both to &le; 25 Gy). Baseline LLMs often fail the entire treatment plan if a single parotid is 40 Gy. RadExplain bypasses LLM logic entirely for this rule, routing both gland values through a dedicated <code>check_parotid_constraint</code> Boolean gate (<code>min &le; 2000 OR max &le; 2500</code>) to prevent false positive violations.</td>
+    </tr>
+    <tr>
+      <td>Fractionation Contextualization</td>
+      <td>QUANTEC constraints change drastically depending on whether the plan is Conventional (2 Gy/fx) or SBRT. RadExplain enforces a pre-retrieval context check to ensure the Knowledge Agent's RAG pipeline pulls the correct fractionation literature <em>before</em> any downstream arithmetic operations begin.</td>
+    </tr>
+    <tr>
+      <td>Missing Data<br>(Graceful Failure)</td>
+      <td>When queried with a non-existent patient ID, baseline LLMs frequently hallucinate fake dosimetric records to satisfy the user's prompt. RadExplain's data ingestion pipeline terminates early when dictionary lookups fail, actively returning a hard error state rather than synthesizing fake data.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="dataset-origin">Dataset Origin</h2>
+
+To ensure the clinical realism of our evaluation, RadExplain operates on real-world patient dosimetric data parsed from the **[OpenKBP Dataset](https://github.com/ababier/open-kbp)** — a public radiotherapy dose prediction dataset from the AAPM Grand Challenge. We processed raw dose-volume histograms (DVHs) from OpenKBP to extract precise spatial and dosimetric metrics (e.g., Max Dose, Mean Dose, Calculation Volume Percentage) for a cohort of head-and-neck cancer patients.
 
 <h2 id="evaluation-results">Evaluation Results</h2>
 
