@@ -240,24 +240,23 @@ To evaluate the system objectively, we utilize an **LLM-as-a-Judge framework** (
 <details>
   <summary>View the 7-Dimension Scoring Rubric & Critical Failure Deductions</summary>
   <div class="details-content">
-
-**The 7-Dimension Scoring Rubric:**
-* **Numerical Accuracy (20 pts):** Strict verification of dose conversions (cGy to Gy) and safety margin arithmetic.
-* **Clinical Classification (20 pts):** Binary check if the model correctly passed or failed the organ based on QUANTEC limits.
-* **Reliability Warning (15 pts):** Ensures the AI flags physical data warnings (e.g., if the calculation volume for a Serial OAR is dangerously low at <80%).
-* **Faithfulness (15 pts):** Strict penalization for any fabricated statistics or thresholds not grounded in the retrieved literature.
-* **Metric Matching (10 pts):** Ensures the correct metric is applied to the correct organ architecture (e.g., Mean Dose for parallel parotids, Max Dose for serial brainstem).
-* **Appropriate Hedging (10 pts) & Concision (10 pts):** Evaluates clinical tone and refusal to definitively approve doses when critical context is missing (e.g., SBRT vs Conventional fractionation).
-
-**Critical Failure Deductions:**
-
-Standard AI benchmarks often forgive "close" answers. In clinical radiotherapy, a close answer is a clinically significant error. The Judge actively deducts points for *Critical Failures*:
-* **-3 pts** for any mathematical error in dose comparison.
-* **-3 pts** for failing to warn the physician about missing grid calculation volume on a serial organ.
-* **-2 pts** for applying the wrong evaluation metric without flagging it.
-
-RadExplain's multi-agent architecture effectively mitigates these critical failures, whereas the baseline LLM frequently triggers them due to mathematical hallucinations and metric confusion.
-
+    <p><strong>The 7-Dimension Scoring Rubric:</strong></p>
+    <ul>
+      <li><strong>Numerical Accuracy (20 pts):</strong> Strict verification of dose conversions (cGy to Gy) and safety margin arithmetic.</li>
+      <li><strong>Clinical Classification (20 pts):</strong> Binary check if the model correctly passed or failed the organ based on QUANTEC limits.</li>
+      <li><strong>Reliability Warning (15 pts):</strong> Ensures the AI flags physical data warnings (e.g., if the calculation volume for a Serial OAR is dangerously low at &lt;80%).</li>
+      <li><strong>Faithfulness (15 pts):</strong> Strict penalization for any fabricated statistics or thresholds not grounded in the retrieved literature.</li>
+      <li><strong>Metric Matching (10 pts):</strong> Ensures the correct metric is applied to the correct organ architecture (e.g., Mean Dose for parallel parotids, Max Dose for serial brainstem).</li>
+      <li><strong>Appropriate Hedging (10 pts) &amp; Concision (10 pts):</strong> Evaluates clinical tone and refusal to definitively approve doses when critical context is missing (e.g., SBRT vs Conventional fractionation).</li>
+    </ul>
+    <p><strong>Critical Failure Deductions:</strong></p>
+    <p>Standard AI benchmarks often forgive "close" answers. In clinical radiotherapy, a close answer is a clinically significant error. The Judge actively deducts points for <em>Critical Failures</em>:</p>
+    <ul>
+      <li><strong>-3 pts</strong> for any mathematical error in dose comparison.</li>
+      <li><strong>-3 pts</strong> for failing to warn the physician about missing grid calculation volume on a serial organ.</li>
+      <li><strong>-2 pts</strong> for applying the wrong evaluation metric without flagging it.</li>
+    </ul>
+    <p>RadExplain's multi-agent architecture effectively mitigates these critical failures, whereas the baseline LLM frequently triggers them due to mathematical hallucinations and metric confusion.</p>
   </div>
 </details>
 
