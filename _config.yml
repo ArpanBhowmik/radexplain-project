@@ -1,22 +1,11 @@
-# Theme selection (clean academic layout)
-theme: jekyll-theme-minimal
+# RadExplain — GitHub Pages Configuration
 
 # Project metadata
 title: "RadExplain"
 description: "A Multi-Agent AI System for Clinical Radiation Oncology Decision Support"
 
-# Sidebar & Navigation Links
-show_downloads: false
-google_analytics: # Optional: UA-XXXXX-Y or G-XXXXX
-
-# Custom links shown in sidebar (Minimal theme supports custom markdown/links)
-nav:
-  - title: "Paper (PDF)"
-    url: "#"
-  - title: "Code"
-    url: "#"
-  - title: "Dataset"
-    url: "#"
+# Disable default theme — we use a fully custom layout
+plugins: []
 
 # Markdown parser settings (supports code blocks and tables)
 kramdown:

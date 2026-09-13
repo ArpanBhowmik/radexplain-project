@@ -3,15 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ site.title }}</title>
+  <meta name="description" content="{{ site.description }}">
+  <meta name="author" content="Arpan Bhowmik, Sarna Rani Bhaduri">
+  <title>{{ site.title }} — {{ site.description }}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ '/assets/css/custom.css' | relative_url }}">
 </head>
 <body>
   <div class="page-container">
     {{ content }}
   </div>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <p>RadExplain &mdash; A Multi-Agent AI System for Clinical Radiation Oncology Decision Support</p>
+      <p class="footer-meta">Last updated: September 2026 &middot; <a href="https://github.com/ArpanBhowmik/radexplain-project" target="_blank">View Source on GitHub</a></p>
+    </div>
+  </footer>
 </body>
 </html>
