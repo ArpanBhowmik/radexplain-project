@@ -152,7 +152,7 @@ layout: default
 
 ## Evaluation Results
 
-The multi-agent system is benchmarked against a baseline LLM (no RAG, no specialized tools) on a 41-question clinical dataset. The results are scored by an LLM-as-a-Judge (GPT-OSS 120B).
+The multi-agent system is benchmarked against a baseline LLM (no RAG, no specialized tools) on a 41-question clinical dataset. The results are scored by an LLM-as-a-Judge (GPT-OSS 120B). The baseline represents the lower bound of LLM-only performance without augmentation. We chose this comparison to quantify the specific contribution of each agentic component (deterministic tooling, RAG retrieval, multi-step orchestration) rather than to claim superiority over state-of-the-art clinical AI systems. We acknowledge the limitations of LLM-based evaluation and plan to supplement with expert human evaluation in future work.
 
 ### 1. RadExplain vs Baseline by Category
 ![Category Performance](assets/headline_grouped_bar.png)
@@ -163,7 +163,7 @@ To rigorously benchmark the system, we constructed a **41-question adversarial c
 * **Multi-OAR Violation Scans:** Prompts the system to evaluate an entire patient DVH blindly. The baseline LLM frequently hallucinates "threshold-free comparisons" (e.g., stating an organ is safe just because its dose is lower than another organ's). RadExplain's Math Agent systematically checks every organ.
 * **Plan Summaries:** Tests the Summary Agent's ability to synthesize raw data and safety violations into a professional, cohesive clinical chart note.
 * **Clinical Context:** Pure medical knowledge queries (e.g., defining serial vs. parallel architecture). Tests the RAG pipeline's retrieval precision independently of patient data.
-* **Failure Mode Probes:** Deliberate trick questions designed to induce hallucinations. We test for *Fractionation Context Confusion* (asking about SBRT when limits are conventional) and *Calculation Volume Omission* (testing if the AI blindly approves a dose when the physical radiation grid is dangerously small). The baseline LLM fails completely here, whereas RadExplain actively flags the traps.
+* **Failure Mode Probes:** Deliberate trick questions designed to induce hallucinations. We test for *Fractionation Context Confusion* (asking about SBRT when limits are conventional) and *Calculation Volume Omission* (testing if the AI blindly approves a dose when the physical radiation grid is dangerously small). The baseline LLM scored significantly lower on these probes, whereas RadExplain consistently detected and flagged the embedded traps.
 * **Edge Cases:** Evaluates graceful failure, ensuring the system refuses to answer when queried with non-existent patient IDs (e.g., `pt_99`) rather than hallucinating fake clinical records.
 
 ### 2. Overall Performance Comparison
@@ -180,24 +180,24 @@ To evaluate the system objectively, we utilize an **LLM-as-a-Judge framework** (
 * **Appropriate Hedging (10 pts) & Concision (10 pts):** Evaluates clinical tone and refusal to definitively approve doses when critical context is missing (e.g., SBRT vs Conventional fractionation).
 
 **Critical Failures (Deductions):**
-Standard AI benchmarks often forgive "close" answers. In clinical radiotherapy, a close answer is a fatal error. The Judge actively deducts points for *Critical Failures*:
+Standard AI benchmarks often forgive "close" answers. In clinical radiotherapy, a close answer is a clinically significant error. The Judge actively deducts points for *Critical Failures*:
 * **-3 pts** for any mathematical error in dose comparison.
 * **-3 pts** for failing to warn the physician about missing grid calculation volume on a serial organ.
 * **-2 pts** for applying the wrong evaluation metric without flagging it.
 
-RadExplain's multi-agent architecture effectively mitigates these critical failures (averaging near-perfect scores), whereas the baseline LLM frequently triggers them due to mathematical hallucinations and metric confusion.
+RadExplain's multi-agent architecture effectively mitigates these critical failures, whereas the baseline LLM frequently triggers them due to mathematical hallucinations and metric confusion.
 
 ### 3. RAG Retrieval Performance
-To ensure the Knowledge Agent grounds its responses in accurate clinical literature without hallucination, the Retrieval-Augmented Generation (RAG) pipeline was stress-tested against a robust dataset of **150 clinical queries** derived from QUANTEC guidelines.
+To ensure the Knowledge Agent grounds its responses in accurate clinical literature without hallucination, the Retrieval-Augmented Generation (RAG) pipeline was evaluated against a dataset of **150 clinical queries** derived from QUANTEC guidelines.
 
 The pipeline utilizes a two-stage retrieval architecture: dense embedding search (`BGE-base-en-v1.5`) followed by cross-encoder reranking (`BGE-reranker-base`) combined with custom Organ-Aware Filtering to prevent cross-organ metric contamination.
 
 **150-Question Benchmark Results:**
-* **MRR Score (Mean Reciprocal Rank): `0.9419`** — The correct QUANTEC guideline chunk is almost universally returned as the absolute #1 ranked result.
+* **MRR Score (Mean Reciprocal Rank): `0.9419`** — The correct QUANTEC guideline chunk is typically returned as the top-ranked result.
 * **Hit@1 Rate: `91.3%`** — Top-1 Accuracy. In 9 out of 10 queries, the very first retrieved document perfectly contains the required clinical metrics.
 * **Hit@3 Rate: `96.7%`** — Top-3 Recall. 
-* **Hit@5 Rate: `98.0%`** — Generation Ceiling. This proves the system is structurally robust enough to handle deep, multi-step clinical reasoning without missing critical edge cases.
-* **Context Precision@5: `97.7%` (Organ Cleanliness)** — In medical AI, retrieving literature for the wrong organ is a fatal safety flaw (e.g., pulling a bladder dose limit when asked about the rectum). By actively filtering chunks *before* ranking, the system achieves a near-perfect precision rate. This means 97.7% of the clinical literature retrieved is strictly isolated to the specific organ the user asked about, eliminating cross-organ hallucinations.
+* **Hit@5 Rate: `98.0%`** — Generation Ceiling. This indicates that relevant clinical evidence is reliably surfaced within the top-5 retrieved chunks, providing a strong foundation for downstream reasoning.
+* **Context Precision@5: `97.7%` (Organ Cleanliness)** — In medical AI, retrieving literature for the wrong organ is a safety-critical flaw (e.g., pulling a bladder dose limit when asked about the rectum). By actively filtering chunks *before* ranking, the system achieves high precision. This means 97.7% of the clinical literature retrieved is strictly isolated to the specific organ the user asked about, substantially reducing the risk of cross-organ contamination in retrieved evidence.
 
 ![RAG Metrics](assets/rag_metrics.png)
 
@@ -233,5 +233,5 @@ While RadExplain demonstrates strong automated evaluation metrics, it is designe
 
 * **Preliminary Automated Benchmarking:** The current evaluation relies on an LLM-as-a-Judge (GPT-OSS 120B) to establish baseline safety metrics. While the judge employs a strict deterministic 100-point clinical rubric, this serves as preliminary validation.
 * **Domain Expert Curation:** The evaluation dataset, QUANTEC reference limits, and deterministic mathematical constraints were heavily curated and verified in collaboration with a **Medical Physics domain expert** (M.Sc. Physics), ensuring the foundational dose arithmetic and baseline ground truths are physically and clinically sound.
-* **Documented Failure Modes:** Despite the agentic architecture's high performance, we manually identified and documented **14 extreme edge cases** where the baseline LLM's clinical reasoning collapses (e.g., *Fractionation Context Confusion*, *Calculation Volume Omission*). This adversarial dataset proves the necessity of multi-agent deterministic tooling.
+* **Documented Failure Modes:** Despite the agentic architecture's high performance, we manually identified and documented **14 extreme edge cases** where the baseline LLM's clinical reasoning collapses (e.g., *Fractionation Context Confusion*, *Calculation Volume Omission*). These failure cases illustrate the potential value of multi-agent deterministic tooling over end-to-end LLM generation for safety-critical clinical tasks.
 * **Future Work:** Transitioning from automated systems benchmarking to formal, blinded clinical validation with board-certified radiation oncologists.
