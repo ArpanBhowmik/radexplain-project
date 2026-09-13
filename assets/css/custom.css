@@ -249,18 +249,23 @@ code {
 }
 
 .toc li {
-  margin-bottom: 0.35rem;
-  font-size: 0.95rem;
+  margin-bottom: 0.6rem;
+  font-size: 1rem;
 }
 
 .toc a {
-  color: var(--text-main);
-  text-decoration: none;
+  color: var(--primary-color);
+  text-decoration: underline;
+  text-decoration-color: rgba(26, 86, 219, 0.3);
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+  transition: all 0.2s ease;
 }
 
 .toc a:hover {
-  color: var(--primary-color);
-  text-decoration: underline;
+  color: #1e40af;
+  text-decoration-color: #1e40af;
+  text-decoration-thickness: 2px;
 }
 
 /* ============================================================
