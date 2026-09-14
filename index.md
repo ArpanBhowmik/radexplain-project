@@ -245,7 +245,7 @@ To rigorously benchmark the system, we constructed a **41-question adversarial c
     </tr>
     <tr>
       <td>Clinical Context</td>
-      <td>Pure medical knowledge queries (e.g., serial vs. parallel organ architecture). Tests RAG retrieval precision independently of patient data.</td>
+      <td>Pure medical knowledge queries (e.g., explaining serial vs. parallel organ architecture). Since no patient data is involved, this tests how well RadExplain’s RAG pipeline retrieves and grounds its answers in clinical literature, compared to the baseline LLM which relies solely on its pre-trained memory.</td>
     </tr>
     <tr>
       <td>Failure Mode Probes</td>
