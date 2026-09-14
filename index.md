@@ -47,7 +47,7 @@ layout: default
 <h2 id="example-queries">Example Queries</h2>
 
 <figure>
-  <img src="assets/Clinical.gif" alt="RadExplain Clinical Assistant" class="img-expand">
+  <video src="assets/High_Resolution.mov" autoplay loop muted playsinline class="img-expand"></video>
   <figcaption><strong>Figure 2.</strong> Clinical AI Assistant dashboard demonstrating real-time multi-agent query processing.</figcaption>
 </figure>
 
