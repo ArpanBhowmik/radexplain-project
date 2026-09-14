@@ -150,7 +150,7 @@ layout: default
   <div class="baseline-box">
     <p>The brainstem dose of 3.26 Gy is well within the safe limit of 54 Gy. No concerns identified.</p>
   </div>
-  <p><em>Notice how the standard baseline missed the calculation volume warning — a clinically significant safety hazard.</em></p>
+  <p><em>The baseline LLM fails to identify the missing calculation volume, illustrating a common safety hazard when relying purely on generative reasoning without deterministic metadata checks.</em></p>
 </div>
 
 <h3>4. Clinical Knowledge & Guideline Retrieval</h3>
